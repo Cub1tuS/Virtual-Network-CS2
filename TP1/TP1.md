@@ -78,6 +78,10 @@ PING 10.1.1.12 (10.1.1.12) 56(84) bytes of data.
 
 ☀️ **A l'aide de Wireshark lancé sur votre PC**
 
+
+ ![test](./wireshark)
+
+
 - visualiser le `ping` entre les deux machines
 - enregistrez la capture avec Wireshark (format `.pcap` ou `.pcapng`), et vous la joindrez au compte-rendu dans le dépôt git
 - précisez dans le compte-rendu quel protocole est utilisé pour envoyer le message `ping`
