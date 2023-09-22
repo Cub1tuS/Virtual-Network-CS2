@@ -60,18 +60,56 @@ success
 
 ☀️ **Configuration de `node1.tp2.efrei`**
 
-- configurer de façon statique son IP
-  - voir l'IP demandée dans le tableau d'adressage juste au dessus
-- prouvez avec une commande `ping` que `node1.tp2.efrei` peut joindre `router.tp2.efrei`
-- ajoutez une route par défaut qui passe par `router.tp2.efrei`
-- prouvez que vous avez un accès internet depuis `node1.tp2.efrei` désormais, avec une commande `ping`
-- utilisez une commande `traceroute` pour prouver que vos paquets passent bien par `router.tp2.efrei` avant de sortir vers internet
+```bash
+[dorian@node1 ~]$ sudo nano /etc/sysconfig/network-scripts/ifcfg-enp0s3 
+NAME=enp0s3
+DEVICE=enp0s3
 
-➜ A la fin de cette section vous avez donc :
+BOOTPROTO=static
+ONBOOT=yes
 
-- un routeur, qui, grâce à du NAT, est connecté à Internet
-- il est aussi connecté au LAN `10.2.1.0/24`
-- les clients du LAN, comme `node1.tp2.efrei` ont eux aussi accès internet, en passant par `router.tp2.efrei` après l'ajout d'une route
+IPADDR=10.2.1.1
+NETMASK=255.255.255.0
+```
+
+```bash
+[dorian@node1 ~]$ ping 10.2.1.254
+PING 10.2.1.254 (10.2.1.254) 56(84) bytes of data.
+64 bytes from 10.2.1.254: icmp_seq=1 ttl=64 time=2.21 ms
+64 bytes from 10.2.1.254: icmp_seq=2 ttl=64 time=1.71 ms
+```
+
+```bash
+[dorian@node1 ~]$ sudo cat /etc/sysconfig/network
+# Created by anaconda
+GATEWAY=10.2.1.254
+```
+
+```bash
+[dorian@node1 ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=113 time=31.3 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=113 time=31.0 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=113 time=31.6 ms
+```
+
+```bash
+[dorian@node1 ~]$ traceroute 8.8.8.8
+traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
+ 1  _gateway (10.2.1.254)  1.537 ms  1.597 ms  1.508 ms
+ 2  192.168.122.1 (192.168.122.1)  1.372 ms  1.554 ms  1.515 ms
+ 3  10.100.0.1 (10.100.0.1)  7.081 ms  7.032 ms  6.904 ms
+ 4  10.100.255.11 (10.100.255.11)  5.668 ms  5.619 ms  5.120 ms
+ 5  185.176.176.10 (185.176.176.10)  32.149 ms  32.030 ms  31.977 ms
+ 6  100.126.127.254 (100.126.127.254)  30.292 ms  27.643 ms  27.584 ms
+ 7  100.126.127.253 (100.126.127.253)  27.547 ms  27.237 ms  28.771 ms
+ 8  185.181.155.200 (185.181.155.200)  29.922 ms  28.660 ms  29.856 ms
+ 9  linkt-2.par.franceix.net (37.49.238.52)  29.819 ms  29.691 ms  29.702 ms
+10  google2.par.franceix.net (37.49.236.2)  29.498 ms  29.453 ms  29.225 ms
+11  108.170.244.225 (108.170.244.225)  28.937 ms 108.170.245.1 (108.170.245.1)  28.833 ms 108.170.244.193 (108.170.244.193)  29.583 ms
+12  142.250.234.41 (142.250.234.41)  29.348 ms 216.239.48.139 (216.239.48.139)  32.816 ms 142.251.253.35 (142.251.253.35)  29.119 ms
+13  dns.google (8.8.8.8)  28.927 ms  28.868 ms  30.861 ms
+```
 
 # II. Serveur DHCP
 
