@@ -78,8 +78,7 @@ PING 10.1.1.12 (10.1.1.12) 56(84) bytes of data.
 
 ☀️ **A l'aide de Wireshark lancé sur votre PC**
 
-
- ![test](./wireshark)
+[Résultat Wireshark](./wireshark/pingtp1.pcapng)
 
 
 - visualiser le `ping` entre les deux machines
