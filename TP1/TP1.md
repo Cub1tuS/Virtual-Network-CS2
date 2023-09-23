@@ -142,6 +142,19 @@ PING 10.1.1.12 (10.1.1.12) 56(84) bytes of data.
 ☀️ **Définir une IP statique sur les trois machines**
 
 ```bash
+sudo nano /etc/sysconfig/network-scripts/ifcfg-enp0s3
+
+NAME=enp0s3
+DEVICE=enp0s3
+
+BOOTPROTO=static
+ONBOOT=yes
+
+IPADDR=10.1.1.2
+NETMASK=255.255.255.0
+```
+ - Définir une adresse ip différente pour chaque machine.
+```bash
 [dorian@node1 ~]$ ip a
 [...]
 2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
