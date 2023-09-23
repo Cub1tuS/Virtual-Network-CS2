@@ -113,16 +113,6 @@ traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
 
 # II. Serveur DHCP
 
-![Topo 2](./img/topo2.png)
-
-➜ **Tableau d'adressage**
-
-| Nom                | IP              |
-| ------------------ | --------------- |
-| `router.tp2.efrei` | `10.2.1.254/24` |
-| `node1.tp2.efrei`  | `N/A`           |
-| `dhcp.tp2.efrei`   | `10.2.1.253/24` |
-
 ☀️ **Install et conf du serveur DHCP** sur `dhcp.tp2.efrei`
 
 ```bash
