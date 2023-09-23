@@ -80,7 +80,7 @@ PING 10.2.1.254 (10.2.1.254) 56(84) bytes of data.
 ```
 
 ```bash
-[dorian@node1 ~]$ sudo cat /etc/sysconfig/network
+[dorian@node1 ~]$ sudo nano /etc/sysconfig/network
 # Created by anaconda
 GATEWAY=10.2.1.254
 ```
@@ -124,6 +124,33 @@ traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
 | `dhcp.tp2.efrei`   | `10.2.1.253/24` |
 
 ☀️ **Install et conf du serveur DHCP** sur `dhcp.tp2.efrei`
+
+```bash
+[dorian@dhcptp2 ~]$ sudo nano /etc/sysconfig/network-scripts/ifcfg-enp0s3
+NAME=enp0s3
+DEVICE=enp0s3
+
+BOOTPROTO=static
+ONBOOT=yes
+
+IPADDR=10.2.1.253
+NETMASK=255.255.255.0
+```
+
+```bash
+[dorian@dhcptp2 ~]$ sudo nano /etc/sysconfig/network
+# Created by anaconda
+GATEWAY=10.2.1.254
+```
+
+```bash
+[dorian@dhcptp2 ~]$ sudo nmcli con reload
+[dorian@dhcptp2 ~]$ sudo nmcli con up enp0s3
+```
+
+```bash
+sudo dnf -y install dhcp-server
+```
 
 - pour l'install du serveur, il faut un accès internet... il suffit d'ajouter là encore une route par défaut, qui passe par `router.tp2.efrei`
 - référez-vous au [TP1](../1/README.md)
