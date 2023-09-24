@@ -277,7 +277,7 @@ PING google.fr (142.250.75.227) 56(84) bytes of data.
 [..]
 ```
 
-![Échange DORA DHCP](.doradhcptp2.pcapng)
+![Échange DORA DHCP](doradhcptp2.pcapng)
 
 # III. ARP
 
