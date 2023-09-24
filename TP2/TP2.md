@@ -174,6 +174,10 @@ ONBOOT=yes
 ```
 
 ```bash
+[dorian@node1 ~]$ sudo dhclient -r
+```
+
+```bash
 [dorian@node1 ~]$ ip a
 [...]
 2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
@@ -181,6 +185,10 @@ ONBOOT=yes
     inet6 fe80::a00:27ff:fe35:b381/64 scope link 
        valid_lft forever preferred_lft forever
 [...]
+```
+
+```bash
+[dorian@node1 ~]$ sudo dhclient
 ```
 
 ```bash
