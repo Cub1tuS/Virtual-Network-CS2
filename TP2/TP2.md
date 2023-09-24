@@ -24,6 +24,7 @@ ONBOOT=yes
 IPADDR=10.2.1.254
 NETMASK=255.255.255.0
 
+DNS1=1.1.1.1
 ```
 
 ```bash
@@ -70,6 +71,8 @@ ONBOOT=yes
 
 IPADDR=10.2.1.1
 NETMASK=255.255.255.0
+
+DNS=1.1.1.1
 ```
 
 ```bash
@@ -125,6 +128,8 @@ ONBOOT=yes
 
 IPADDR=10.2.1.253
 NETMASK=255.255.255.0
+
+DNS1=1.1.1.1
 ```
 
 ```bash
@@ -135,43 +140,136 @@ GATEWAY=10.2.1.254
 
 ```bash
 [dorian@dhcptp2 ~]$ sudo nmcli con reload
-[dorian@dhcptp2 ~]$ sudo nmcli con up enp0s3
 ```
 
 ```bash
 sudo dnf -y install dhcp-server
 ```
 
-- pour l'install du serveur, il faut un accès internet... il suffit d'ajouter là encore une route par défaut, qui passe par `router.tp2.efrei`
-- référez-vous au [TP1](../1/README.md)
-- cette fois, dans la conf, ajoutez une option DHCP pour donner au client l'adresse de la passerelle du réseau (c'est à dire l'adresse de `router.tp2.efrei`) en plus de leur proposer une IP libre
+```bash
+[dorian@dhcptp2 ~]$ sudo nano /etc/dhcp/dhcpd.conf
+```
+
+```bash
+default-lease-time 3600;
+max-lease-time 86400;
+authoritative;
+
+subnet 10.2.1.0 netmask 255.255.255.0 {
+range 10.2.1.100 10.2.1.200;
+option routers 10.2.1.254;
+option subnet-mask 255.255.255.0;
+}
+```
 
 ☀️ **Test du DHCP** sur `node1.tp2.efrei`
 
-- enlevez toute config IP effectuée au préalable
-- vous pouvez par exemple `sudo nmcli con del enp0s3` s'il s'agit de l'interface `enp0s3` pour supprimer la conf liée à `enp0s3`
-- configurez l'interface pour qu'elle récupère une IP dynamique, c'est à dire avec DHCP
-- vérifiez que :
-  - l'IP obtenue est correcte
-  - votre table de routage a bien été mise à jour automatiquement avec l'adresse de la passerelle en route par défaut (votre option DHCP a bien été reçue !)
-  - vous pouvez immédiatement joindre internet
+```bash
+[dorian@node1 ~]$ sudo nano /etc/sysconfig/network-scripts/ifcfg-enp0s3 
+NAME=enp0s3
+DEVICE=enp0s3
 
-![DHCP](img/dhcp_server.png)
+BOOTPROTO=DHCP
+ONBOOT=yes
+```
+
+```bash
+[dorian@node1 ~]$ ip a
+[...]
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:35:b3:81 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::a00:27ff:fe35:b381/64 scope link 
+       valid_lft forever preferred_lft forever
+[...]
+```
+
+```bash
+[dorian@node1 ~]$ ip a
+[...]
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:35:b3:81 brd ff:ff:ff:ff:ff:ff
+    inet 10.2.1.100/24 brd 10.2.1.255 scope global dynamic enp0s3
+       valid_lft 3493sec preferred_lft 3493sec
+    inet6 fe80::a00:27ff:fe35:b381/64 scope link 
+       valid_lft forever preferred_lft forever
+[...]
+```
+
+```bash
+[dorian@node1 ~]$ ip r s
+default via 10.2.1.254 dev enp0s3 
+10.2.1.0/24 dev enp0s3 proto kernel scope link src 10.2.1.100 
+192.168.56.0/24 dev enp0s8 proto kernel scope link src 192.168.56.107 metric 101 
+```
+
+```bash
+[dorian@node1 ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=113 time=22.0 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=113 time=23.2 ms
+```
+
+```bash
+[dorian@node1 ~]$ ping google.fr
+PING google.fr (142.250.75.227) 56(84) bytes of data.
+64 bytes from par10s41-in-f3.1e100.net (142.250.75.227): icmp_seq=1 ttl=113 time=20.2 ms
+64 bytes from par10s41-in-f3.1e100.net (142.250.75.227): icmp_seq=2 ttl=113 time=22.4 ms
+```
 
 🌟 **BONUS**
 
-- ajouter une autre ligne dans la conf du serveur DHCP pour qu'il donne aussi l'adresse d'un serveur DNS (utilisez `1.1.1.1` comme serveur DNS : c'est l'un des serveurs DNS de CloudFlare, un gros acteur du web)
+```bash
+default-lease-time 3600;
+max-lease-time 86400;
+authoritative;
+
+subnet 10.2.1.0 netmask 255.255.255.0 {
+range 10.2.1.100 10.2.1.200;
+option routers 10.2.1.254;
+option subnet-mask 255.255.255.0;
+}
+```
+
+```bash
+[dorian@node1 ~]$ ping google.fr
+PING google.fr (142.250.75.227) 56(84) bytes of data.
+64 bytes from par10s41-in-f3.1e100.net (142.250.75.227): icmp_seq=1 ttl=113 time=20.2 ms
+64 bytes from par10s41-in-f3.1e100.net (142.250.75.227): icmp_seq=2 ttl=113 time=22.4 ms
+```
 
 ☀️ **Wireshark it !**
 
-- je veux une capture Wireshark qui contient l'échange DHCP DORA
-- vous hébergerez la capture dans le dépôt Git avec le TP
+```bash
+[dorian@node1 ~]$ sudo dhclient -r
+```
 
-> Si vous fouillez un peu dans l'échange DORA? vous pourrez voir les infos DHCP circuler : comme votre option DHCP qui a un champ dédié dans l'un des messages.
+```bash
+[dorian@node1 ~]$ ip a
+[...]
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:35:b3:81 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::a00:27ff:fe35:b381/64 scope link 
+       valid_lft forever preferred_lft forever
+[...]
+```
 
-➜ A la fin de cette section vous avez donc :
+```bash
+[dorian@node1 ~]$ sudo dhclient
+```
 
-- un serveur DHCP qui donne aux clients toutes les infos nécessaires pour avoir un accès internet automatique
+```bash
+[dorian@node1 ~]$ ip a
+[...]
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:35:b3:81 brd ff:ff:ff:ff:ff:ff
+    inet 10.2.1.100/24 brd 10.2.1.255 scope global dynamic enp0s3
+       valid_lft 2560sec preferred_lft 2560sec
+    inet6 fe80::a00:27ff:fe35:b381/64 scope link 
+       valid_lft forever preferred_lft forever
+[..]
+```
+
+![Échange DORA DHCP](.doradhcptp2.pcapng)
 
 # III. ARP
 
