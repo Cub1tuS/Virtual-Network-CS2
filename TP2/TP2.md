@@ -283,25 +283,19 @@ PING google.fr (142.250.75.227) 56(84) bytes of data.
 
 ## 1. Les tables ARP
 
-ARP est un protocole qui permet d'obtenir la MAC de quelqu'un, quand on connaît son IP.
-
-On connaît toujours l'IP du correspondant avant de le joindre, c'est un prérequis. Quand vous tapez `ping 10.2.1.1`, vous connaissez l'IP, puisque vous venez de la taper :D
-
-La machine va alors automatiquement effectuer un échange ARP sur le réseau, afin d'obtenir l'adresse MAC qui correspond à `10.2.1.1`.
-
-Une fois l'info obtenue, l'info "telle IP correspond à telle MAC" est stockée dans la **table ARP**.
-
-> Pour toutes les manips qui suivent, référez-vous au [mémo réseau Rocky](../../memo/rocky_network.md).
-
 ☀️ **Affichez la table ARP de `router.tp2.efrei`**
 
-- vérifiez la présence des IP et MAC de `node1.tp2.efrei` et `dhcp.tp2.efrei`
-- s'il manque l'une et/ou l'autre : go faire un `ping` : l'échange ARP sera effectuée automatiquement, et vous devriez voir l'IP et la MAC de la machine que vous avez ping dans la table ARP
+```bash
+[dorian@node1 ~]$ ip neigh show
+10.2.1.254 dev enp0s3 lladdr 08:00:27:9a:50:ba REACHABLE 
+192.168.56.100 dev enp0s8 lladdr 08:00:27:52:c8:4d STALE 
+10.2.1.253 dev enp0s3 lladdr 08:00:27:a9:4f:18 STALE 
+192.168.56.1 dev enp0s8 lladdr 0a:00:27:00:00:00 REACHABLE 
+```
 
 ☀️ **Capturez l'échange ARP avec Wireshark**
 
-- je veux une capture de l'échange ARP livrée dans le dépôt Git
-- l'échange ARP, c'est deux messages seulement : un ARP request et un ARP reply
+![Échange DORA DHCP](arptp2.pcapng)
 
 ## 2. ARP poisoning
 
