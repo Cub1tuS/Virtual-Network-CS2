@@ -295,7 +295,7 @@ PING google.fr (142.250.75.227) 56(84) bytes of data.
 
 ☀️ **Capturez l'échange ARP avec Wireshark**
 
-![Échange DORA DHCP](arptp2.pcapng)
+![ARP Request/Reply](arptp2.pcapng)
 
 ## 2. ARP poisoning
 
