@@ -301,12 +301,13 @@ PING google.fr (142.250.75.227) 56(84) bytes of data.
 
 ☀️ **Exécuter un simple ARP poisoning**
 
-- pas de man in the middle ici ou quoique ce soit, rien d'extrêmement poussé, mais simplement : écrire arbitrairement dans la table ARP de quelqu'un d'autre
-- il "suffit" d'envoyer un seul message ARP pour forcer l'écriture dans la table ARP de la machine qui reçoit votre message
-- je vous laisse vous renseigner par vous-mêmes un peu pour cette partie !
-- le but : écrivez dans la table ARP de `node1` que l'adresse `10.2.1.254` correspond à l'adresse MAC de votre choix
-  - **cela a pour conséquence que vous pouvez usurper l'identité de `10.2.1.254` (c'est le routeur) auprès de `node1`**. Stylish.
+```bash
+[dorian@node1 ~]$ sudo ip neigh change 10.2.1.254 lladdr 08:00:27:a9:4f:18 dev enp0s3
+```
 
-> C'est faisable super facilement en une seule commande shell : `arping`. Je recommande pas Rocky pour utiliser ça, ce sera chiant de l'installer je pense. Et bien sûr, n'hésitez pas à me contacter.
-
-![APR sniffed ?](img/arp_sniff.jpg)
+```bash
+[dorian@node1 ~]$ ip neigh show
+10.2.1.254 dev enp0s3 lladdr 08:00:27:a9:4f:18 PERMANENT 
+10.2.1.253 dev enp0s3 lladdr 08:00:27:a9:4f:18 STALE 
+192.168.56.1 dev enp0s8 lladdr 0a:00:27:00:00:00 REACHABLE 
+```
