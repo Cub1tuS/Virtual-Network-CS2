@@ -1,24 +1,7 @@
 # Mise en place de la topologie et routage
-
-- [Mise en place de la topologie et routage](#mise-en-place-de-la-topologie-et-routage)
-  - [Présentation](#présentation)
-    - [Topologie](#topologie)
-    - [Tableau d'adressage](#tableau-dadressage)
   - [I. Setup GNS3](#i-setup-gns3)
   - [II. Routes routes routes](#ii-routes-routes-routes)
   - [Potit bilan](#potit-bilan)
-
-## Présentation
-
-![Dat topo](../img/dat_topo.jpg)
-
-Cette partie se concentre sur les niveaux 2 et 3 du réseau : les MAC et les IP. On parle pas de serveurs ou quoique ce soit, juste faire en sorte que tout le monde se `ping`, à travers des réseaux différents.
-
-> Lisez bien les étapes dans l'ordre. Je vous donne, dans un ordre cohérent, les étapes de configuration à réaliser.
-
-### Topologie
-
-![Topologie 1](./../img/topo1.png)
 
 ### Tableau d'adressage
 
@@ -35,17 +18,105 @@ Cette partie se concentre sur les niveaux 2 et 3 du réseau : les MAC et les IP.
 
 🌞 **Mettre en place la topologie dans GS3**
 
-- reproduisez la topologie, configurez les IPs et les noms sur toutes les machines
-- une fois en place, assurez-vous donc que :
-  - toutes les machines du réseau 1 peuvent se `ping` entre elles
-  - toutes les machines du réseau 2 peuvent se `ping` entre elles
-  - toutes les machines du réseau 3 peuvent se `ping` entre elles
-- le `router1.tp3` doit avoir un accès internet normal
-  - référez-vous au TP2 pour le setup
-  - prouvez avec une commande `ping` qu'il peut joindre une IP publique connue
-  - prouvez avec une commande `ping` qu'il peut joindre des machines avec leur nom DNS public (genre `efrei.fr`)
+**Réseau 1**
 
-> Pour rappel, l'expression "avoir internet" sur une machine donnée désigne plusieurs choses techniquement parlant : être connecté à un routeur physiquement, que ce routeur soit défini comme la passerelle de la route par défaut sur la machine en question, et cette machine doit aussi connaître l'adresse IP d'un serveur DNS qui est joignable depuis son réseau.
+```bash
+[dorian@node1net1 ~]$ ping 10.3.1.12
+PING 10.3.1.12 (10.3.1.12) 56(84) bytes of data.
+64 bytes from 10.3.1.12: icmp_seq=1 ttl=64 time=1.98 ms
+64 bytes from 10.3.1.12: icmp_seq=2 ttl=64 time=1.65 ms
+^C
+--- 10.3.1.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 1.646/1.811/1.977/0.165 ms
+
+[dorian@node1net1 ~]$ ping 10.3.1.254
+PING 10.3.1.254 (10.3.1.254) 56(84) bytes of data.
+64 bytes from 10.3.1.254: icmp_seq=1 ttl=64 time=1.79 ms
+64 bytes from 10.3.1.254: icmp_seq=2 ttl=64 time=1.53 ms
+^C
+--- 10.3.1.254 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 1.530/1.660/1.791/0.130 ms
+```
+
+```bash
+[dorian@node2net1 ~]$ ping 10.3.1.254
+PING 10.3.1.254 (10.3.1.254) 56(84) bytes of data.
+64 bytes from 10.3.1.254: icmp_seq=1 ttl=64 time=1.69 ms
+64 bytes from 10.3.1.254: icmp_seq=2 ttl=64 time=1.57 ms
+^C
+--- 10.3.1.254 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 1.567/1.628/1.689/0.061 ms
+```
+
+**Réseau 2**
+```bash
+[dorian@node1tp2 ~]$ ping 10.3.2.11
+PING 10.3.2.11 (10.3.2.11) 56(84) bytes of data.
+64 bytes from 10.3.2.11: icmp_seq=1 ttl=64 time=0.051 ms
+64 bytes from 10.3.2.11: icmp_seq=2 ttl=64 time=0.077 ms
+^C
+--- 10.3.2.11 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1047ms
+rtt min/avg/max/mdev = 0.051/0.064/0.077/0.013 ms
+
+[dorian@node1tp2 ~]$ ping 10.3.2.254
+PING 10.3.2.254 (10.3.2.254) 56(84) bytes of data.
+64 bytes from 10.3.2.254: icmp_seq=1 ttl=64 time=2.34 ms
+64 bytes from 10.3.2.254: icmp_seq=2 ttl=64 time=1.74 ms
+^C
+--- 10.3.2.254 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 1.738/2.041/2.344/0.303 ms
+```
+
+```bash
+[dorian@node2tp2 ~]$ ping 10.3.2.254
+PING 10.3.2.254 (10.3.2.254) 56(84) bytes of data.
+64 bytes from 10.3.2.254: icmp_seq=1 ttl=64 time=1.67 ms
+64 bytes from 10.3.2.254: icmp_seq=2 ttl=64 time=1.46 ms
+^C
+--- 10.3.2.254 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 1.461/1.563/1.665/0.102 ms
+```
+
+**Réseau 3**
+
+```bash
+[dorian@router1 ~]$ ping 10.3.100.2
+PING 10.3.100.2 (10.3.100.2) 56(84) bytes of data.
+64 bytes from 10.3.100.2: icmp_seq=1 ttl=64 time=1.56 ms
+64 bytes from 10.3.100.2: icmp_seq=2 ttl=64 time=1.41 ms
+^C
+--- 10.3.100.2 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1005ms
+rtt min/avg/max/mdev = 1.413/1.484/1.555/0.071 ms
+```
+
+**Internet `router1.tp3`**
+
+```bash
+[dorian@router1 ~]$ ping google.com
+PING google.com (172.217.20.174) 56(84) bytes of data.
+64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=1 ttl=114 time=15.4 ms
+64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=2 ttl=114 time=17.0 ms
+^C
+--- google.com ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 15.359/16.185/17.011/0.826 ms
+
+[dorian@router1 ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=114 time=15.6 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=114 time=17.2 ms
+^C
+--- 8.8.8.8 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 15.570/16.401/17.233/0.831 ms
+```
 
 ## II. Routes routes routes
 
