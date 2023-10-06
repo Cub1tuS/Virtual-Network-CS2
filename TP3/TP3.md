@@ -221,23 +221,20 @@ PING 10.3.1.11 (10.3.1.11) 56(84) bytes of data.
 rtt min/avg/max/mdev = 1.895/2.865/3.835/0.970 ms
 ```
 
-
-- ajoutez les routes nécessaires pour que les membres du réseau 1 puissent joindre les membres du réseau 2 (et inversement)
-- **attention** : n'ajoutez que les routes strictement nécessaires
-- chaque machine ne doit connaître une route que vers les réseaux dont il a besoin
-
-> *Attention, aucune route par défaut ne doit être configurée pour le moment. Uniquement des routes statiques vers des réseaux précis.*
-
-➜ Par exemple, `node1.net1.tp3` :
-
-- sait déjà joindre le réseau 1, car il est lui même dedans
-- a besoin d'une route vers le réseau 2, qui utilise `router1.tp3` comme passerelle
-- il n'a pas besoin de connaître une route vers le réseau 3
-- référez-vous au [**mémo**](../../../memo/rocky_network.md) pour ça !
-
-> ***N'ajoutez aucune route vers le réseau 3.***
-
 🌞 **Mettre en place les routes par défaut**
+```bash
+[dorian@node1net1 ~]$ echo 'GATEWAY=10.3.1.254' | sudo tee /etc/sysconfig/network
+
+[dorian@node2net1 ~]$ echo 'GATEWAY=10.3.1.254' | sudo tee /etc/sysconfig/network
+
+[dorian@node1net2 ~]$ echo 'GATEWAY=10.3.2.254' | sudo tee /etc/sysconfig/network
+
+[dorian@node2net2 ~]$ echo 'GATEWAY=10.3.2.254' | sudo tee /etc/sysconfig/network
+
+[dorian@router2 ~]$ echo 'GATEWAY=10.3.100.1' | sudo tee /etc/sysconfig/network
+```
+
+**Je reboot mes machines**
 
 - faire en sorte que toutes les machines de votre topologie aient un accès internet, il faut donc :
   - sur les machines du réseau 1, ajouter `router.net1.tp3` comme passerelle par défaut
