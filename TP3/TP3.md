@@ -1,7 +1,6 @@
 # Mise en place de la topologie et routage
   - [I. Setup GNS3](#i-setup-gns3)
   - [II. Routes routes routes](#ii-routes-routes-routes)
-  - [Potit bilan](#potit-bilan)
 
 ### Tableau d'adressage
 
@@ -236,30 +235,34 @@ rtt min/avg/max/mdev = 1.895/2.865/3.835/0.970 ms
 
 **Je reboot mes machines**
 
-- faire en sorte que toutes les machines de votre topologie aient un accès internet, il faut donc :
-  - sur les machines du réseau 1, ajouter `router.net1.tp3` comme passerelle par défaut
-  - sur les machines du réseau 2, ajouter `router.net2.tp3` comme passerelle par défaut
-  - sur l`router.net2.tp3`, ajouter `router1.net.tp3` comme passerelle par défaut
-- prouvez avec un `ping` depuis `node1.net1.tp3` que vous avez bien un accès internet
-- prouvez avec un `traceroute` depuis `node2.net1.tp3` que vous avez bien un accès internet, et que vos paquets transitent bien par `router2.tp3` puis par `router1.tp3` avant de sortir vers internet
+```bash
+[dorian@node1net1 ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=113 time=1986 ms
+64 bytes from 8.8.8.8: icmp_seq=5 ttl=113 time=962 ms
+64 bytes from 8.8.8.8: icmp_seq=6 ttl=113 time=17.2 ms
+64 bytes from 8.8.8.8: icmp_seq=7 ttl=113 time=18.7 ms
+64 bytes from 8.8.8.8: icmp_seq=8 ttl=113 time=18.8 ms
+^C
+--- 8.8.8.8 ping statistics ---
+8 packets transmitted, 5 received, 37.5% packet loss, time 7141ms
+rtt min/avg/max/mdev = 17.239/600.422/1985.645/783.086 ms, pipe 2
+```
 
-> *Là encore, utilisez le [**mémo**](../../../memo/rocky_network.md) pour l'ajout de la route par défaut.*
-
-Toutes les machines peuvent se joindre, et ont un accès internet. Yay.
-
-![The siiize](../img/routing_table.jpg)
-
-## Potit bilan
-
-➜ Une fois cette section terminée, vous savez interconnecter autant de réseaux que nécessaires, de façon statique :
-
-- **les routeurs sont l'élément central** : ils permettent aux paquets d'un réseau de passer vers un autre
-- **pour pouvoir communiquer avec un autre réseau B, une machine doit :**
-  - avoir une IP dans un réseau A
-  - connaître l'IP d'un routeur qui lui aussi est dans le réseau A : il agira comme passerelle pour la machine
-  - indiquer dans la table de routage de la machine qu'il existe une route vers le réseau B, en passant par la passerelle du réseau A
-- **peu importe qu'il y ait des réseaux intermédiaires entre A et B : la machine cliente n'a pas besoin de le savoir**, elle n'a besoin que de connaître sa passerelle !
-
-> *En effet, dans notre exemple, aucune des machines du Réseau 1 ou du Réseau 2 ne peut joindre les IPs du Réseau 3. Pourtant des paquets transitent par ce réseau quand le Réseau 1 et le Réseau 2 échangent des paquets, ou même quand les memebres du Réseau 2 vont sur internet.*
-
-On peut passer à la suite : [config des services réseau](../network_services/README.md).
+```bash
+[dorian@node2net1 ~]$ traceroute 1.1.1.1
+traceroute to 1.1.1.1 (1.1.1.1), 30 hops max, 60 byte packets
+ 1  * * *
+ 2  192.168.122.1 (192.168.122.1)  1.232 ms  1.193 ms  1.430 ms
+ 3  10.100.0.1 (10.100.0.1)  6.530 ms  6.494 ms  6.459 ms
+ 4  10.100.255.11 (10.100.255.11)  5.474 ms  5.433 ms  5.183 ms
+ 5  185.176.176.10 (185.176.176.10)  23.785 ms  23.741 ms  23.622 ms
+ 6  100.126.127.254 (100.126.127.254)  18.039 ms  17.725 ms  17.682 ms
+ 7  100.126.127.253 (100.126.127.253)  16.172 ms  14.681 ms  14.629 ms
+ 8  185.181.155.200 (185.181.155.200)  14.796 ms  17.744 ms  17.698 ms
+ 9  linktsas-ic-381495.ip.twelve99-cust.net (62.115.186.121)  17.659 ms  18.032 ms  16.854 ms
+10  prs-b1-link.ip.twelve99.net (62.115.186.86)  16.807 ms prs-b9-link.ip.twelve99.net (62.115.186.120)  16.772 ms  15.291 ms
+11  cloudflare-ic-375100.ip.twelve99-cust.net (80.239.194.103)  15.426 ms prs-b1-link.ip.twelve99.net (62.115.115.88)  19.741 ms  18.157 ms
+12  cloudflare-ic-363840.ip.twelve99-cust.net (213.248.73.69)  18.101 ms cloudflare-ic-375100.ip.twelve99-cust.net (80.239.194.103)  52.670 ms 172.71.128.2 (172.71.128.2)  20.049 ms
+13  172.71.116.2 (172.71.116.2)  37.892 ms one.one.one.one (1.1.1.1)  19.711 ms 172.71.132.2 (172.71.132.2)  19.592 ms
+```
