@@ -122,21 +122,105 @@ rtt min/avg/max/mdev = 15.570/16.401/17.233/0.831 ms
 
 🌞 **Activer le routage sur les deux machines `router`**
 
+**J'active le routage sur `router1` et `router2`**
 ```bash
-# On active le forwarding IPv4
-[it4@router ~]$ sudo sysctl -w net.ipv4.ip_forward=1 
-net.ipv4.ip_forward = 1
+sudo sysctl -w net.ipv4.ip_forward=1
 
-# Petite modif du firewall qui nous bloquerait sinon
-[it4@router ~]$ sudo firewall-cmd --add-masquerade
-success
+sudo firewall-cmd --add-masquerade
 
-# Et on tape aussi la même commande une deuxième fois, en ajoutant --permanent pour que ce soit persistent après un éventuel reboot
-[it4@router ~]$ sudo firewall-cmd --add-masquerade --permanent
-success
+sudo firewall-cmd --add-masquerade --permanent
 ```
 
 🌞 **Mettre en place les routes locales**
+
+```bash
+[dorian@router1 ~]$ cat /etc/sysconfig/network-scripts/route-enp0s8 
+10.3.2.0/24 via 10.3.100.2
+
+[dorian@router2 ~]$ sudo ip route add 10.3.2.0/24 via 10.3.100.2 dev enp0s8
+```
+
+```bash
+[dorian@router2 ~]$ sudo ip route add 10.3.1.0/24 via 10.3.100.1 dev enp0s3
+
+[dorian@router2 ~]$ sudo cat /etc/sysconfig/network-scripts/route-enp0s3
+10.3.1.0/24 via 10.3.100.1
+
+[dorian@router2 ~]$ ping 10.3.2.11
+PING 10.3.2.11 (10.3.2.11) 56(84) bytes of data.
+64 bytes from 10.3.2.11: icmp_seq=1 ttl=64 time=1.38 ms
+64 bytes from 10.3.2.11: icmp_seq=2 ttl=64 time=1.54 ms
+64 bytes from 10.3.2.11: icmp_seq=3 ttl=64 time=1.76 ms
+^C
+--- 10.3.2.11 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 1.378/1.559/1.762/0.157 ms
+```
+
+```bash
+[dorian@node1net1 ~]$ sudo cat /etc/sysconfig/network-scripts/route-enp0s3
+10.3.2.0/24 via 10.3.1.254
+
+[dorian@node1net1 ~]$ sudo ip route add 10.3.2.0/24 via 10.3.1.254 dev enp0s3
+
+[dorian@node1net1 ~]$ ping 10.3.2.11
+PING 10.3.2.11 (10.3.2.11) 56(84) bytes of data.
+64 bytes from 10.3.2.11: icmp_seq=1 ttl=62 time=5.80 ms
+64 bytes from 10.3.2.11: icmp_seq=2 ttl=62 time=4.14 ms
+^C
+--- 10.3.2.11 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 4.139/4.967/5.795/0.828 ms
+```
+
+```bash
+[dorian@node2net1 ~]$ sudo cat /etc/sysconfig/network-scripts/route-enp0s3
+10.3.2.0/24 via 10.3.1.254
+
+[dorian@node2net1 ~]$ sudo ip route add 10.3.2.0/24 via 10.3.1.254 dev enp0s3
+
+[dorian@node2net1 ~]$ ping 10.3.2.11
+PING 10.3.2.11 (10.3.2.11) 56(84) bytes of data.
+64 bytes from 10.3.2.11: icmp_seq=1 ttl=62 time=4.65 ms
+64 bytes from 10.3.2.11: icmp_seq=2 ttl=62 time=3.61 ms
+^C
+--- 10.3.2.11 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 3.614/4.131/4.648/0.517 ms
+```
+
+```bash
+[dorian@node1net2 ~]$ sudo ip route add 10.3.1.0/24 via 10.3.2.254 dev enp0s3
+
+[dorian@node1net2 ~]$ sudo cat /etc/sysconfig/network-scripts/route-enp0s3
+10.3.1.0/24 via 10.3.2.254
+
+[dorian@node1net2 ~]$ ping 10.3.1.11
+PING 10.3.1.11 (10.3.1.11) 56(84) bytes of data.
+64 bytes from 10.3.1.11: icmp_seq=1 ttl=62 time=3.63 ms
+64 bytes from 10.3.1.11: icmp_seq=2 ttl=62 time=3.44 ms
+^C
+--- 10.3.1.11 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 3.436/3.532/3.628/0.096 ms
+```
+
+```bash
+[dorian@node2net2 ~]$ sudo ip route add 10.3.1.0/24 via 10.3.2.254 dev enp0s3
+
+[dorian@node2net2 ~]$ sudo cat /etc/sysconfig/network-scripts/route-enp0s3
+10.3.1.0/24 via 10.3.2.254
+
+[dorian@node2net2 ~]$ ping 10.3.1.11
+PING 10.3.1.11 (10.3.1.11) 56(84) bytes of data.
+64 bytes from 10.3.1.11: icmp_seq=1 ttl=62 time=1.90 ms
+64 bytes from 10.3.1.11: icmp_seq=2 ttl=62 time=3.84 ms
+^C
+--- 10.3.1.11 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 1.895/2.865/3.835/0.970 ms
+```
+
 
 - ajoutez les routes nécessaires pour que les membres du réseau 1 puissent joindre les membres du réseau 2 (et inversement)
 - **attention** : n'ajoutez que les routes strictement nécessaires
