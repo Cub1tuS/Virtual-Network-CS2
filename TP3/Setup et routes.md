@@ -1,8 +1,9 @@
 # Mise en place de la topologie et routage
-  - [I. Setup GNS3](#i-setup-gns3)
-  - [II. Routes routes routes](#ii-routes-routes-routes)
 
-### Tableau d'adressage
+- [I. Setup GNS3](#i-setup-gns3)
+- [II. Routes routes routes](#ii-routes-routes-routes)
+
+## Tableau d'adressage
 
 | Machine          | Réseau 1        | Réseau 2        | Réseau 3        |
 | ---------------- | --------------- | --------------- | --------------- |
@@ -17,7 +18,7 @@
 
 🌞 **Mettre en place la topologie dans GS3**
 
-**Réseau 1**
+ > **Réseau 1**
 
 ```bash
 [dorian@node1net1 ~]$ ping 10.3.1.12
@@ -50,7 +51,8 @@ PING 10.3.1.254 (10.3.1.254) 56(84) bytes of data.
 rtt min/avg/max/mdev = 1.567/1.628/1.689/0.061 ms
 ```
 
-**Réseau 2**
+> **Réseau 2**
+
 ```bash
 [dorian@node1tp2 ~]$ ping 10.3.2.11
 PING 10.3.2.11 (10.3.2.11) 56(84) bytes of data.
@@ -82,7 +84,7 @@ PING 10.3.2.254 (10.3.2.254) 56(84) bytes of data.
 rtt min/avg/max/mdev = 1.461/1.563/1.665/0.102 ms
 ```
 
-**Réseau 3**
+> **Réseau 3**
 
 ```bash
 [dorian@router1 ~]$ ping 10.3.100.2
@@ -95,7 +97,7 @@ PING 10.3.100.2 (10.3.100.2) 56(84) bytes of data.
 rtt min/avg/max/mdev = 1.413/1.484/1.555/0.071 ms
 ```
 
-**Internet `router1.tp3`**
+> **Internet `router1.tp3`**
 
 ```bash
 [dorian@router1 ~]$ ping google.com
@@ -122,6 +124,7 @@ rtt min/avg/max/mdev = 15.570/16.401/17.233/0.831 ms
 🌞 **Activer le routage sur les deux machines `router`**
 
 **J'active le routage sur `router1` et `router2`**
+
 ```bash
 sudo sysctl -w net.ipv4.ip_forward=1
 
@@ -221,6 +224,7 @@ rtt min/avg/max/mdev = 1.895/2.865/3.835/0.970 ms
 ```
 
 🌞 **Mettre en place les routes par défaut**
+
 ```bash
 [dorian@node1net1 ~]$ echo 'GATEWAY=10.3.1.254' | sudo tee /etc/sysconfig/network
 
@@ -232,8 +236,6 @@ rtt min/avg/max/mdev = 1.895/2.865/3.835/0.970 ms
 
 [dorian@router2 ~]$ echo 'GATEWAY=10.3.100.1' | sudo tee /etc/sysconfig/network
 ```
-
-**Je reboot mes machines**
 
 ```bash
 [dorian@node1net1 ~]$ ping 8.8.8.8

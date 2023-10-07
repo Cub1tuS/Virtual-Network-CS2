@@ -1,6 +1,6 @@
 # TP2 : Routage, DHCP et DNS
 
-# Sommaire
+## Sommaire
 
 - [TP2 : Routage, DHCP et DNS](#tp2--routage-dhcp-et-dns)
 - [Sommaire](#sommaire)
@@ -10,9 +10,10 @@
   - [1. Les tables ARP](#1-les-tables-arp)
   - [2. ARP poisoning](#2-arp-poisoning)
 
-# I. Routage
+## I. Routage
 
 ☀️ **Configuration de `router.tp2.efrei`**
+
 ```bash
 [dorian@router ~]$ sudo cat /etc/sysconfig/network-scripts/ifcfg-enp0s8
 NAME=enp0s8
@@ -114,7 +115,7 @@ traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
 13  dns.google (8.8.8.8)  28.927 ms  28.868 ms  30.861 ms
 ```
 
-# II. Serveur DHCP
+## II. Serveur DHCP
 
 ☀️ **Install et conf du serveur DHCP** sur `dhcp.tp2.efrei`
 
@@ -279,9 +280,9 @@ PING google.fr (142.250.75.227) 56(84) bytes of data.
 
 ![Échange DORA DHCP](doradhcptp2.pcapng)
 
-# III. ARP
+## III. ARP
 
-## 1. Les tables ARP
+### 1. Les tables ARP
 
 ☀️ **Affichez la table ARP de `router.tp2.efrei`**
 
@@ -297,7 +298,7 @@ PING google.fr (142.250.75.227) 56(84) bytes of data.
 
 ![ARP Request/Reply](arptp2.pcapng)
 
-## 2. ARP poisoning
+### 2. ARP poisoning
 
 ☀️ **Exécuter un simple ARP poisoning**
 

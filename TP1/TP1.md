@@ -6,9 +6,7 @@
 - [II. Ajoutons un switch](#ii-ajoutons-un-switch)
 - [III. Serveur DHCP](#iii-serveur-dhcp)
 
-
-# I. Most simplest LAN
-
+## I. Most simplest LAN
 
 ☀️ **Déterminer l'adresse MAC de vos deux machines**
 
@@ -50,6 +48,7 @@ ONBOOT=yes
 IPADDR=10.1.1.2
 NETMASK=255.255.255.0
 ```
+
 ```bash
 dorian@node2 ~]$ ip a
 [...]
@@ -61,6 +60,7 @@ dorian@node2 ~]$ ip a
        valid_lft forever preferred_lft forever
 [...]
 ```
+
 ```bash
 sudo nmcli con reload
 sudo nmcli con up enp0s3
@@ -87,6 +87,7 @@ PING 10.1.1.12 (10.1.1.12) 56(84) bytes of data.
 64 bytes from 10.1.1.12: icmp_seq=2 ttl=64 time=0.135 ms
 64 bytes from 10.1.1.12: icmp_seq=3 ttl=64 time=0.098 ms
 ```
+
 - Le protocole est icmp.
 
 🌟 **BONUS**
@@ -100,7 +101,8 @@ PING 10.1.1.12 (10.1.1.12) 56(84) bytes of data.
 192.168.56.1 dev enp0s8 lladdr 0a:00:27:00:00:00 REACHABLE 
 ```
 
-# II. Ajoutons un switch
+## II. Ajoutons un switch
+
 ☀️ **Déterminer l'adresse MAC de vos trois machines**
 
 ```bash
@@ -153,7 +155,9 @@ ONBOOT=yes
 IPADDR=10.1.1.2
 NETMASK=255.255.255.0
 ```
- - Définir une adresse ip différente pour chaque machine.
+
+- Définir une adresse ip différente pour chaque machine.
+
 ```bash
 [dorian@node1 ~]$ ip a
 [...]
@@ -197,6 +201,7 @@ NETMASK=255.255.255.0
 PING 10.1.1.2 (10.1.1.2) 56(84) bytes of data.
 64 bytes from 10.1.1.2: icmp_seq=1 ttl=64 time=1.34 ms
 ```
+
 ```bash
 [dorian@node2 ~]$ ping 10.1.1.3
 PING 10.1.1.3 (10.1.1.3) 56(84) bytes of data.
@@ -209,7 +214,7 @@ PING 10.1.1.1 (10.1.1.1) 56(84) bytes of data.
 64 bytes from 10.1.1.1: icmp_seq=1 ttl=64 time=0.778 ms
 ```
 
-# III. Serveur DHCP
+## III. Serveur DHCP
 
 ☀️ **Donner un accès Internet à la machine `dhcp.tp1.efrei`**
 
