@@ -1,7 +1,5 @@
 # I. DHCP
 
-Bon, vous devez être rodés nan maintenant ?!
-
 🌞 **Setup de la machine `dhcp.net1.tp3`**
 
 ```bash
@@ -63,26 +61,11 @@ IP4.DNS[1]:                             1.1.1.1
 # II. Serveur Web
 
 - [II. Serveur Web](#ii-serveur-web)
-  - [Intro](#intro)
   - [1. Installation](#1-installation)
   - [2. Page HTML et racine web](#2-page-html-et-racine-web)
   - [3. Config de NGINX](#3-config-de-nginx)
   - [4. Firewall](#4-firewall)
   - [5. Test](#5-test)
-
-## Introole HTTP. Si on télécharge un fichier standard, écrit en HTML par exemple, avec un logiciel client adapté, un navigateur web par exemple, alors le navigateur met en forme visuellement le HTML et on accède à un "site web". Woaw.
-
-On va donc, dans l'ordre :
-
-1. setup une nouvelle machine `web.net2.tp3` (ou recycler un `node` de la première partie du TP)
-2. installer un serveur web : on va utiliser NGINX ici
-3. créer une bête page HTML (une phrase toute nulle dans un fichier texte, tout simplement)
-4. configurer le serveur web
-5. configurer le firewall de Rocky pour autoriser les clients à joindre le serveur Web
-6. lancer le serveur web
-7. tester qu'on accède bien au site (visualisation de notre page HTML toute nulle)
-
-> On commence doucement à amener la notion de **firewall**. Rocky est bien évidemment muni d'un firewall actif par défaut. Il s'appelle *Firewalld* sous Rocky.
 
 ## 1. Installation
 
