@@ -54,38 +54,25 @@ sudo dnf install -y bind bind-utils
 
 ## 2. Config
 
-La configuration du serveur DNS va se faire dans 3 fichiers essentiellement :
-
-- **un fichier de configuration principal**
-  - `/etc/named.conf`
-  - on définit les trucs généraux, comme les adresses IP et le port où le serveur DNS sera disponible
-  - on définit aussi un chemin vers les autres fichiers, les fichiers de zone
-- **un fichier de zone**
-  - `/var/named/net1.tp3.db`
-  - je vous préviens, la syntaxe fait mal
-  - on peut y définir des correspondances `nom ---> IP`
-- **un fichier de zone inverse**
-  - `/var/named/net1.tp3.rev`
-  - on peut y définir des correspondances `IP ---> nom`
-
-➜ **Allooooons-y, fichier de conf principal**
+> J'ai eu des problèmes au niveau de la configuration du serveur dû aux noms de mes machines, j'ai donc préférer les renommer exactement comme dans le TP.
 
 ```bash
-[dorian@dnsnet2 ~]$ sudo cat /etc/named.conf
-
+[dorian@dns ~]$ sudo cat /etc/named.conf
+[sudo] password for dorian: 
 options {
-    listen-on port 53 { 127.0.0.1; };
-    listen-on-v6 port 53 { ::1; };
-	directory 	"/var/named";
-	dump-file 	"/var/named/data/cache_dump.db";
+        listen-on port 53 { 127.0.0.1; any; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+	dump-file	"/var/named/data/cache_dump.db";
 	statistics-file "/var/named/data/named_stats.txt";
 	memstatistics-file "/var/named/data/named_mem_stats.txt";
 	secroots-file	"/var/named/data/named.secroots";
 	recursing-file	"/var/named/data/named.recursing";
-	allow-query     { localhost; };
+        
+	allow-query     { localhost; any; };
         allow-query-cache { localhost; any; };
 
-	recursion yes;
+        recursion yes;
 
 	dnssec-validation yes;
 
@@ -95,7 +82,6 @@ options {
 	pid-file "/run/named/named.pid";
 	session-keyfile "/run/named/session.key";
 
-	/* https://fedoraproject.org/wiki/Changes/CryptoPolicy */
 	include "/etc/crypto-policies/back-ends/bind.config";
 };
 
@@ -106,31 +92,27 @@ logging {
         };
 };
 
-zone "net2" IN {
-     type master;
-     file "net2.db";
-     allow-update { none; };
-     allow-query {any; };
+zone "net2.tp3" IN {
+	type master;
+	file "net2.tp3.db";
+	allow-update { none; };
+	allow-query {any; };
 };
 
 zone "2.3.10.in-addr.arpa" IN {
      type master;
-     file "net2.rev";
+     file "net2.tp3.rev";
      allow-update { none; };
      allow-query { any; };
 };
-
-include "/etc/named.rfc1912.zones";
-include "/etc/named.root.key";
 ```
 
 ➜ **Et pour les fichiers de zone**
 
 ```bash
-
-[dorian@dnsnet2 ~]$ sudo cat /var/named/net2.db
+[dorian@dns ~]$ sudo cat /var/named/net2.tp3.db
 $TTL 86400
-@ IN SOA dnsnet2. adminnet2. (
+@ IN SOA dns.net2.tp3. admin.net2.tp3. (
     2019061800 ;Serial
     3600 ;Refresh
     1800 ;Retry
@@ -139,7 +121,7 @@ $TTL 86400
 )
 
 ; Infos sur le serveur DNS lui même (NS = NameServer)
-@ IN NS dnsnet2.
+@ IN NS dns.net2.tp3.
 
 ; Enregistrements DNS pour faire correspondre des noms à des IPs
 dns        IN A 10.3.2.102
@@ -147,10 +129,9 @@ web        IN A 10.3.2.101
 ```
 
 ```bash
-
-[dorian@dnsnet2 ~]$ sudo cat /var/named/net2.rev
+[dorian@dns ~]$ sudo cat /var/named/net2.tp3.rev
 $TTL 86400
-@ IN SOA dnsnet2. adminnet2. (
+@ IN SOA dns.net2.tp3. admin.net2.tp3. (
     2019061800 ;Serial
     3600 ;Refresh
     1800 ;Retry
@@ -159,22 +140,22 @@ $TTL 86400
 )
 
 ; Infos sur le serveur DNS lui même (NS = NameServer)
-@ IN NS dnsnet2.
+@ IN NS dns.net2.tp3.
 
 ;Reverse lookup for Name Server
-102   IN PTR dnsnet2.
-101   IN PTR webnet2.
+102   IN PTR dns.net2.tp3.
+101   IN PTR web.net2.tp3.
 ```
 
 ➜ **Une fois ces 3 fichiers en place, démarrez le service DNS**
 
 ```bash
-[dorian@dnsnet2 ~]$ sudo systemctl start named
+[dorian@dns ~]$ sudo systemctl start named
 
-[dorian@dnsnet2 ~]$ sudo systemctl enable named
+[dorian@dns ~]$ sudo systemctl enable named
 Created symlink /etc/systemd/system/multi-user.target.wants/named.service → /usr/lib/systemd/system/named.service.
 
-[dorian@dnsnet2 ~]$ sudo systemctl status named
+[dorian@dns ~]$ sudo systemctl status named
 ● named.service - Berkeley Internet Name Domain (DNS)
      Loaded: loaded (/usr/lib/systemd/system/named.service; enabled; preset: disabled)
      Active: active (running) since Sat 2023-10-07 18:49:36 CEST; 5min ago
@@ -191,17 +172,17 @@ Created symlink /etc/systemd/system/multi-user.target.wants/named.service → /u
 🌞 **Ouvrir le port nécessaire dans le firewall**
 
 ```bash
-[dorian@dnsnet2 ~]$ sudo firewall-cmd --add-port=53/udp --permanent
+[dorian@dns ~]$ sudo firewall-cmd --add-port=53/udp --permanent
 success
 ```
 
 ```bash
-[dorian@dnsnet2 ~]$ sudo firewall-cmd --reload
+[dorian@dns ~]$ sudo firewall-cmd --reload
 success
 ```
 
 ```bash
-[dorian@dnsnet2 ~]$ sudo firewall-cmd --list-all
+[dorian@dns ~]$ sudo firewall-cmd --list-all
 public (active)
   target: default
   icmp-block-inversion: no
@@ -220,30 +201,92 @@ public (active)
 
 ## 4. Test
 
-Depuis une machine cliente du réseau, utilisez la commande `dig` pour faire des requêtes DNS à la main.
-
-La commande `dig` sert à effectuer des requêtes DNS à la main depuis une machine Linux (on l'a obtenu en téléchargeant le paquet `bind-utils` quand on a install Rocky ensemble). Elle s'utilise comme suit :
-
-```bash
-# faire une requête DNS en utilisant le serveur DNS connu par l'OS
-$ dig efrei.fr
-
-# faire une requête DNS en précisant à quel serveur DNS on pose la question
-$ dig efrei.fr @1.1.1.1
-
-# faire une requête DNS inverse (trouver le nom qui correspond à une IP)
-$ dig -x 10.3.2.101
-```
-
 🌞 **Depuis l'une des machines clientes du réseau 1** (par exemple `node1.net1.tp3`)
 
-- utiliser `dig` pour trouver à quelle IP correspond le nom `web.net2.tp3`
-- utiliser `curl` pour visiter le site web sur `web.net2.tp3` en utilisant son nom
-  - assurez-vous de purger votre fichier `hosts` de vos éventuelles précédentes modifications
+```bash
+[dorian@node1 ~]$ dig web.net2.tp3 @10.3.2.102
+
+; <<>> DiG 9.16.23-RH <<>> web.net2.tp3 @10.3.2.102
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 27675
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 8cc46a6c44559fcd010000006522f2b99e5bbf2169ff777f (good)
+;; QUESTION SECTION:
+;web.net2.tp3.			IN	A
+
+;; ANSWER SECTION:
+web.net2.tp3.		86400	IN	A	10.3.2.101
+
+;; Query time: 2 msec
+;; SERVER: 10.3.2.102#53(10.3.2.102)
+;; WHEN: Sun Oct 08 20:19:37 CEST 2023
+;; MSG SIZE  rcvd: 85
+```
+
+```bash
+[dorian@node1 ~]$ curl web.net2.tp3
+coucou EFREI
+```
+
+```bash
+[dorian@node1 ~]$ cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+```
 
 ## 5. DHCP my old friend
 
 🌞 **Editez la configuration du serveur DHCP sur `dhcp.net1.tp3`**
 
-- l'adresse du serveur DNS qui est donnée au client doit désormais être celle de `dns.net2.tp3` (il faut bien préciser une IP, pas le nom)
-- prouvez que ça fonctionne avec un `dig` depuis un client qui a fraîchement récupéré une IP
+```bash
+[dorian@dhcp ~]$ sudo cat /etc/dhcp/dhcpd.conf
+#
+# DHCP Server Configuration file.
+#   see /usr/share/doc/dhcp-server/dhcpd.conf.example
+#   see dhcpd.conf(5) man page
+#
+
+default-lease-time 3600;
+max-lease-time 86400;
+authoritative;
+
+subnet 10.3.1.0 netmask 255.255.255.0 {
+range 10.3.1.50 10.3.1.99;
+option subnet-mask 255.255.255.0;
+option routers 10.3.1.254;
+option domain-name-servers 10.3.2.102;
+}
+```
+
+```bash
+[dorian@node1 ~]$ nmcli dev show | grep 'IP4.DNS'
+IP4.DNS[1]:                             10.3.2.102
+```
+
+```bash
+[dorian@node1 ~]$ dig web.net2.tp3
+
+; <<>> DiG 9.16.23-RH <<>> web.net2.tp3
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 38967
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 86415b795fb36eae010000006522f5ac049e9a8b87b6d3bd (good)
+;; QUESTION SECTION:
+;web.net2.tp3.			IN	A
+
+;; ANSWER SECTION:
+web.net2.tp3.		86400	IN	A	10.3.2.101
+
+;; Query time: 1 msec
+;; SERVER: 10.3.2.102#53(10.3.2.102)
+;; WHEN: Sun Oct 08 20:32:13 CEST 2023
+;; MSG SIZE  rcvd: 85
+```
