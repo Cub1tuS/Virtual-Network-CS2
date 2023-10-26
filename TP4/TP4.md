@@ -137,7 +137,7 @@ Le meilleur moyen reste donc de développer. Je recommande Python et la librairi
 Avec la librairie Scapy il est très facile, en une seule ligne de code, d'envoyer une trame complètement arbitraire sur le réseau.
 
 C'est donc une libairie parfaite pour mettre en place une attaque réseau comme l'ARP poisoning.
-    
+
 ### 1. Scapy
 
 Le procédé que je vous recommande est le suivant :
@@ -155,6 +155,23 @@ Le procédé que je vous recommande est le suivant :
   - les paquets ICMP servent à plein de trucs, et il y a un identifiant pour chaque fonction, c'est un entier qui est indiqué dans le paquet ICMP
   - type `8` : *echo request* : c'est le ping
   - type `0` : *echo reply* : c'est le pong
+
+```bash
+>>> packet=IP(dst='192.168.56.102')/ICMP()/Raw(load=RandString(56))
+```
+
+```bash
+>>> answer=sr1(packet, timeout=1)
+Begin emission:
+Finished sending 1 packets.
+.*
+Received 2 packets, got 1 answers, remaining 0 packets
+```
+
+```bash
+>>> answer.show
+<bound method Packet.show of <IP  version=4 ihl=5 tos=0x0 len=84 id=22072 flags= frag=0 ttl=64 proto=icmp chksum=0x32b9 src=192.168.56.102 dst=192.168.56.1 |<ICMP  type=echo-reply code=0 chksum=0x4c20 id=0x0 seq=0x0 unused='' |<Raw  load='et2sBzRsQC9oGIFGbP9LHSpc6pSdmL20RohrYbc1YmJdfTHGGAEoCCWL' |>>>>
+```
 
 > Les autres types ICMP servent à d'autres trucs que la commande `ping`. Voyez ICMP comme un protocole de diagnostic réseau.
 
