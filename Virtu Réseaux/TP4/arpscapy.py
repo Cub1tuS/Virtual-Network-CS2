@@ -1,4 +1,4 @@
-import scapy.all
+from scapy.all import *
 
 packet=IP(dst='192.168.56.102')/ICMP()/Raw(load=RandString(56))
 
